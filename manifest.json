@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "toolpkg_id": "com.community.dual_life_hub",
+  "version": "1.0.3",
+  "main": "dist/main.js",
+  "display_name": {
+    "zh": "双人生活簿",
+    "en": "Dual Life Hub",
+    "default": "Dual Life Hub"
+  },
+  "description": {
+    "zh": "双人财务、双人备忘与可选的生理期日历。支持双方称呼、记录模式与独立主题色。",
+    "en": "Two-person finance, two-person memos, and an optional period calendar with configurable names, record mode, and independent theme colors.",
+    "default": "A configurable two-person life hub."
+  },
+  "author": [
+    "Community Build"
+  ],
+  "enabled_by_default": true,
+  "subpackages": [
+    {
+      "id": "life_hub_core",
+      "entry": "dist/packages/life_hub_core.js",
+      "enabled_by_default": true,
+      "display_name": {
+        "zh": "生活簿工具",
+        "en": "Life Hub Tools"
+      },
+      "description": {
+        "zh": "财务、备忘和生理期记录工具。",
+        "en": "Finance, memo, and period record tools."
+      }
+    }
+  ],
+  "resources": [
+    {
+      "key": "life_hub_server_py",
+      "path": "resources/runtime/server.py",
+      "mime": "text/x-python"
+    },
+    {
+      "key": "life_hub_web_index",
+      "path": "resources/webapp/index.html",
+      "mime": "text/html"
+    }
+  ]
+}
