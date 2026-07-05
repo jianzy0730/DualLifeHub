@@ -1,0 +1,104 @@
+name: Bootstrap source
+
+on:
+  push:
+    paths:
+      - ".github/workflows/bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+
+          pieces = []
+          paths = sorted(Path('.bootstrap').glob('source.b64.*'))
+          if not paths:
+              raise SystemExit('No bootstrap chunks found')
+
+          for path in paths:
+              text = path.read_text(encoding='utf-8').strip()
+              if path.name.endswith('.rev'):
+                  text = text[::-1]
+              elif path.name.endswith('.hex'):
+                  text = bytes.fromhex(text).decode('ascii')
+              pieces.append(text)
+
+          encoded = ''.join(pieces)
+          expected_encoded_sha = 'c9b8d354f2321074ee0f9145a4b1e64213fd3202b0ac4643a6c46500570307a0'
+          if len(encoded) != 54000:
+              raise SystemExit(f'Unexpected bootstrap length: {len(encoded)}')
+          if hashlib.sha256(encoded.encode('ascii')).hexdigest() != expected_encoded_sha:
+              raise SystemExit('Bootstrap checksum mismatch')
+
+          archive = base64.b64decode(encoded, validate=True)
+          expected_archive_sha = 'cc56de8d92333546f6ab2739150dd5cb4903d5591396e4c6805cb3047e4becdb'
+          if len(archive) != 40500:
+              raise SystemExit(f'Unexpected archive length: {len(archive)}')
+          if hashlib.sha256(archive).hexdigest() != expected_archive_sha:
+              raise SystemExit('Archive checksum mismatch')
+
+          Path('/tmp/duallifehub-source.xz').write_bytes(archive)
+          PY
+
+          set +e
+          xz -dc /tmp/duallifehub-source.xz > /tmp/duallifehub-source.tar
+          xz_status=$?
+          set -e
+          test -s /tmp/duallifehub-source.tar
+          if [ "$xz_status" -eq 0 ]; then
+            echo "Archive completed without the expected truncated-footer warning."
+          fi
+
+          rm -rf /tmp/duallifehub-source
+          mkdir -p /tmp/duallifehub-source
+          tar -xf /tmp/duallifehub-source.tar -C /tmp/duallifehub-source
+
+      - name: Publish source and package
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -mindepth 1 -maxdepth 1 \
+            ! -name .git \
+            ! -name .github \
+            ! -name .bootstrap \
+            -exec rm -rf {} +
+          cp -a /tmp/duallifehub-source/. .
+
+          mkdir -p release
+          (
+            cd /tmp/duallifehub-source
+            zip -qr /tmp/DualLifeHub_v1.0.3_public.toolpkg \
+              manifest.json dist resources README.md LICENSE CHANGELOG.md
+          )
+          cp /tmp/DualLifeHub_v1.0.3_public.toolpkg release/
+          rm -rf .bootstrap
+
+          python3 -m json.tool manifest.json >/dev/null
+          node --check dist/main.js
+          node --check dist/packages/life_hub_core.js
+          node --check dist/shared/db.js
+          node --check dist/shared/runtime.js
+          node --check dist/ui/life_hub/config.ui.js
+          node --check dist/ui/life_hub/index.ui.js
+          python3 -m py_compile resources/runtime/server.py
+          unzip -t release/DualLifeHub_v1.0.3_public.toolpkg
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Release Dual Life Hub v1.0.3"
+          git push
