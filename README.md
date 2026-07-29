@@ -10,6 +10,12 @@
 - 双主题色：用户与 AI 分别配置颜色，身份卡片、按钮、标记和主要财务卡会同步变化
 - 自定义称呼：设置 AI 如何称呼用户，以及用户如何称呼 AI
 
+## 扩展包
+
+仓库中的 `extensions/` 存放 DualLife 系列的独立 Operit ToolPkg。它们与生活簿共享项目定位，但分别安装、分别维护包 ID 和版本号。
+
+- [`extensions/dual-mind-memory/`](extensions/dual-mind-memory/)：**双生记忆 / DualMind Memory**，提供角色隔离的自动召回、状态标记、概率衰减、观察期、修订轨迹和可审计遗忘。
+
 ## 安装与初始化
 
 1. 在 Operit 中导入并启用 `.toolpkg`。
@@ -38,10 +44,11 @@
 
 ## 包内结构
 
-- `manifest.json`：包信息与资源声明
-- `dist/`：ToolPkg 主脚本、工具与 UI 入口
-- `resources/runtime/server.py`：本地数据服务
+- `manifest.json`：生活簿主包信息与资源声明
+- `dist/`：生活簿 ToolPkg 主脚本、工具与 UI 入口
+- `resources/runtime/server.py`：生活簿本地数据服务
 - `resources/webapp/index.html`：生活簿界面
+- `extensions/`：独立安装的 DualLife 系列扩展源码
 
 ## 版本
 
