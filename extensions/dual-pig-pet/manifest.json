@@ -1,16 +1,18 @@
 {
   "schema_version": 1,
   "toolpkg_id": "com.community.dual_pig_pet",
-  "version": "0.1.0",
-  "author": ["小鱼"],
+  "version": "0.2.0",
+  "author": [
+    "小鱼"
+  ],
   "main": "main.js",
   "display_name": {
     "zh": "双生猪猪",
     "en": "DualPig Companion"
   },
   "description": {
-    "zh": "基于当前 Operit 角色卡的可触摸虚拟小猪。支持点击、长按、抚摸、拖动和揪尾巴，并由角色 LLM 决定回复、情绪和动作。",
-    "en": "A touchable virtual pig driven by the active Operit character card, with tap, press, pet, drag, and tail-pull interactions."
+    "zh": "基于当前 Operit 角色卡的可触摸虚拟小猪。交互立即本地响应并批量记录，下一次正常聊天时自动告知角色。",
+    "en": "A touchable virtual pig with instant local reactions; interactions are batched into the active Operit character context on the next normal reply."
   },
   "subpackages": [
     {
