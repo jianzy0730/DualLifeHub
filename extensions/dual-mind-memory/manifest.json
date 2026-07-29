@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "toolpkg_id": "com.community.dual_mind_memory",
+  "version": "0.1.0",
+  "author": [
+    "小鱼"
+  ],
+  "main": "main.js",
+  "display_name": {
+    "zh": "双生记忆",
+    "en": "DualMind Memory"
+  },
+  "description": {
+    "zh": "基于 Operit 原生记忆库的角色隔离记忆层，支持状态标记、自动召回、概率衰减、观察期、修订和可审计遗忘。",
+    "en": "A role-scoped memory layer built on Operit's native memory library with recall, decay, quarantine, revision, and auditable forgetting."
+  },
+  "subpackages": [
+    {
+      "id": "dual_mind_memory",
+      "entry": "packages/dual_mind_memory.js",
+      "enabled_by_default": true,
+      "display_name": {
+        "zh": "双生记忆核心",
+        "en": "DualMind Memory Core"
+      },
+      "description": {
+        "zh": "创建、召回、标记、修订、遗忘、恢复和解释记忆。",
+        "en": "Create, recall, mark, revise, forget, restore, and explain memories."
+      }
+    }
+  ]
+}
