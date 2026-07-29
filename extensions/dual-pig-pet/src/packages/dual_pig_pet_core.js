@@ -33,14 +33,18 @@ const PetCore = (function () {
   const ALLOWED_EMOTIONS = ["neutral", "happy", "shy", "annoyed", "sleepy", "surprised"];
 
   function defaultState() {
-    return { schema_version: 1, affection: 50, energy: 80, mood: "neutral", last_action: "idle", pending: null, updated_at: Date.now() };
+    return { schema_version: 2, affection: 50, energy: 80, mood: "neutral", last_action: "idle", interaction_count: 0, pending_events: [], recent_events: [], pending: null, updated_at: Date.now() };
   }
 
   async function readState() {
     try {
       const result = await Tools.Files.read(STATE_PATH);
       const parsed = JSON.parse(String(result && result.content || ""));
-      return Object.assign(defaultState(), parsed || {});
+      const state = Object.assign(defaultState(), parsed || {});
+      if (!Array.isArray(state.pending_events)) state.pending_events = [];
+      if (!Array.isArray(state.recent_events)) state.recent_events = [];
+      state.schema_version = 2;
+      return state;
     } catch (_error) {
       return defaultState();
     }
@@ -74,7 +78,7 @@ const PetCore = (function () {
   }
 
   async function main() {
-    complete({ success: true, message: "双生猪猪核心已加载", data: { version: "0.1.0" } });
+    complete({ success: true, message: "双生猪猪核心已加载", data: { version: "0.2.0" } });
   }
 
   return {
