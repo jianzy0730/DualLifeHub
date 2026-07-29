@@ -3,7 +3,7 @@ import json, shutil, subprocess, zipfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='0.1.0'
+VERSION='0.2.0'
 OUT=ROOT/'release'/f'DualPigCompanion_v{VERSION}.toolpkg'
 
 def run(*args:str)->None:

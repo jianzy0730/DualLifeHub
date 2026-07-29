@@ -15,7 +15,7 @@
 仓库中的 `extensions/` 存放 DualLife 系列的独立 Operit ToolPkg。它们与生活簿共享项目定位，但分别安装、分别维护包 ID 和版本号。
 
 - [`extensions/dual-mind-memory/`](extensions/dual-mind-memory/)：**双生记忆 / DualMind Memory**，提供角色隔离的自动召回、状态标记、概率衰减、观察期、修订轨迹和可审计遗忘。
-- [`extensions/dual-pig-pet/`](extensions/dual-pig-pet/)：**双生猪猪 / DualPig Companion**，提供由当前角色卡驱动的可触摸小猪身体，支持抚摸、拖动、揪尾巴和 LLM 动作编排。
+- [`extensions/dual-pig-pet/`](extensions/dual-pig-pet/)：**双生猪猪 / DualPig Companion**，提供立即响应的可触摸小猪身体；互动会本地排队，并在下一次正常聊天时批量告知当前角色卡。
 
 ## 安装与初始化
 
