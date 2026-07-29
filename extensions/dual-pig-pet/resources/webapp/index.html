@@ -25,12 +25,12 @@ button{font:inherit;color:inherit;border:0}.app{height:100%;max-width:760px;marg
 <body>
 <div class="app">
   <header class="top">
-    <div class="brand"><div class="brand-icon">🐽</div><div><h1>双生猪猪</h1><p>身体由前端控制，性格完全来自当前角色卡</p></div></div>
+    <div class="brand"><div class="brand-icon">🐽</div><div><h1>双生猪猪</h1><p>触摸立即响应，互动会在下次聊天时告诉角色</p></div></div>
     <button class="reset" id="reset" aria-label="重置">↻</button>
   </header>
   <main class="stage-card" id="stage">
     <i class="room-dot d1"></i><i class="room-dot d2"></i><i class="room-dot d3"></i>
-    <div class="bubble show" id="bubble">摸摸我，或者试试那条很明显的卷尾巴。</div>
+    <div class="bubble show" id="bubble">摸一下就会立刻动，不用等模型。</div>
     <div class="pet-wrap">
       <svg class="pig" id="pet" data-emotion="neutral" viewBox="0 0 420 430" aria-label="可互动小猪">
         <defs>
@@ -80,24 +80,36 @@ button{font:inherit;color:inherit;border:0}.app{height:100%;max-width:760px;marg
 <script>
 const pet=document.getElementById('pet'),stage=document.getElementById('stage'),bubble=document.getElementById('bubble'),source=document.getElementById('source');
 const affectionBar=document.getElementById('affectionBar'),energyBar=document.getElementById('energyBar'),affectionText=document.getElementById('affectionText'),energyText=document.getElementById('energyText');
-let busy=false,pointer=null,bubbleTimer=null,lastPendingId='';
+let pointer=null,bubbleTimer=null,lastPendingId='',actionQueue=Promise.resolve();
 const durations={blink:520,ear_twitch:620,tail_wag:1500,head_tilt:900,bounce:760,lean_forward:920,nuzzle:980,shake:650,recoil:760,sit:900,sleep:1900,tail_snap:820};
-const previews={tap_head:['blink'],tap_body:['bounce'],long_press:['lean_forward'],pet_head:['tail_wag'],pet_back:['tail_wag'],drag:['shake'],tail_pull:['tail_snap']};
-const previewReplies={tap_head:'嗯？',tap_body:'哼。',long_press:'……',pet_head:'唔。',pet_back:'还行。',drag:'别搬我。',tail_pull:'喂！'};
+const localDecisions={
+ tap_head:{reply:'？',emotion:'surprised',actions:['blink','head_tilt']},tap_body:{reply:'嗯',emotion:'neutral',actions:['bounce','blink']},
+ long_press:{reply:'……',emotion:'shy',actions:['lean_forward','tail_wag']},pet_head:{reply:'♪',emotion:'happy',actions:['nuzzle','tail_wag','blink']},
+ pet_back:{reply:'♪',emotion:'happy',actions:['tail_wag','sit']},drag:{reply:'！',emotion:'surprised',actions:['shake','recoil']},
+ tail_pull:{reply:'！！',emotion:'annoyed',actions:['tail_snap','recoil','shake']}
+};
 function bridge(name,payload){const h=window.DualPigHost;if(!h||typeof h[name]!=='function')throw new Error('Operit 宿主桥接尚未就绪');let r=payload===undefined?h[name]():h[name](payload);if(typeof r==='string'){try{r=JSON.parse(r)}catch(_){}}return r}
-function showBubble(text,thinking=false){clearTimeout(bubbleTimer);bubble.textContent=text||'……';bubble.classList.toggle('thinking',thinking);bubble.classList.add('show');if(!thinking)bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),6500)}
+function showBubble(text){clearTimeout(bubbleTimer);bubble.textContent=text||'……';bubble.classList.remove('thinking');bubble.classList.add('show');bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),2600)}
 function setState(s){if(!s)return;const a=Math.max(0,Math.min(100,Number(s.affection??50))),e=Math.max(0,Math.min(100,Number(s.energy??80)));affectionBar.style.width=a+'%';energyBar.style.width=e+'%';affectionText.textContent=Math.round(a);energyText.textContent=Math.round(e);pet.dataset.emotion=s.mood||'neutral'}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function playActions(actions){for(const item of (actions||[]).slice(0,3)){const name=typeof item==='string'?item:item&&item.name;if(!durations[name])continue;const cls='act-'+name;pet.classList.remove(cls);void pet.getBoundingClientRect();pet.classList.add(cls);await sleep(durations[name]);pet.classList.remove(cls)}}
-async function interact(type,meta={}){if(busy)return;busy=true;source.textContent='角色正在决定动作';showBubble(previewReplies[type]||'……',true);playActions(previews[type]||['blink']);try{const result=await Promise.resolve(bridge('interact',{type,...meta}));if(!result||!result.success)throw new Error(result&&result.message||'角色没有回应');const data=result.data||{},d=data.decision||{};pet.dataset.emotion=d.emotion||'neutral';showBubble(d.reply||'……',false);source.textContent=data.source==='llm'?'当前角色卡 · LLM':'本地备用反应';setState(data.state);await playActions(d.actions||[])}catch(e){showBubble('我刚才走神了，再碰我一下。');source.textContent='调用失败';console.error(e)}finally{busy=false}}
+function enqueueActions(actions){actionQueue=actionQueue.then(()=>playActions(actions)).catch(console.error);return actionQueue}
+function interact(type,meta={}){
+ const d=localDecisions[type]||localDecisions.tap_body;
+ pet.dataset.emotion=d.emotion;showBubble(d.reply);source.textContent='即时反应 · 已记下';enqueueActions(d.actions);
+ Promise.resolve().then(()=>bridge('interact',{type,...meta})).then(result=>{
+   if(!result||!result.success)throw new Error(result&&result.message||'记录失败');
+   setState(result.data&&result.data.state);const n=result.data&&result.data.queued||0;source.textContent=n?'待告诉角色 · '+n+' 条':'互动已记录';
+ }).catch(e=>{source.textContent='动画正常 · 记录失败';console.error(e)});
+}
 function zoneOf(target){const e=target&&target.closest&&target.closest('[data-zone]');return e?e.dataset.zone:'body'}
 stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const zone=zoneOf(e.target),now=Date.now();pointer={id:e.pointerId,zone,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,startAt:now,distance:0,triggered:false};stage.setPointerCapture?.(e.pointerId);if(zone==='tail')pet.classList.add('preview-tail');pointer.timer=setTimeout(()=>{if(pointer&&!pointer.triggered&&pointer.distance<15){pointer.triggered=true;interact('long_press',{duration_ms:Date.now()-pointer.startAt})}},680)});
 stage.addEventListener('pointermove',e=>{if(!pointer||e.pointerId!==pointer.id)return;const dx=e.clientX-pointer.lastX,dy=e.clientY-pointer.lastY;pointer.distance+=Math.hypot(dx,dy);pointer.lastX=e.clientX;pointer.lastY=e.clientY;if(pointer.zone==='tail'&&!pointer.triggered&&pointer.distance>24){pointer.triggered=true;clearTimeout(pointer.timer);interact('tail_pull',{distance:Math.round(pointer.distance),duration_ms:Date.now()-pointer.startAt})}});
 function endPointer(e){if(!pointer||e.pointerId!==pointer.id)return;clearTimeout(pointer.timer);pet.classList.remove('preview-tail');const p=pointer;pointer=null;if(p.triggered)return;const dur=Date.now()-p.startAt,dx=p.lastX-p.startX,dy=p.lastY-p.startY,absX=Math.abs(dx),absY=Math.abs(dy);if(p.zone==='head'&&p.distance>52&&absX>absY*.75)interact('pet_head',{distance:Math.round(p.distance),duration_ms:dur});else if(p.zone==='body'&&p.distance>58)interact('drag',{distance:Math.round(p.distance),duration_ms:dur});else if(p.zone==='tail')interact('tail_pull',{distance:0,duration_ms:dur});else interact(p.zone==='head'?'tap_head':'tap_body',{duration_ms:dur})}
 stage.addEventListener('pointerup',endPointer);stage.addEventListener('pointercancel',e=>{if(pointer&&e.pointerId===pointer.id){clearTimeout(pointer.timer);pointer=null;pet.classList.remove('preview-tail')}});
 document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>interact(b.dataset.action));
-document.getElementById('reset').onclick=async()=>{if(busy)return;try{const r=await Promise.resolve(bridge('resetState'));setState(r.data);pet.dataset.emotion='neutral';showBubble('重新开始。别又一上来就揪尾巴。')}catch(e){console.error(e)}};
-async function boot(){try{const r=await Promise.resolve(bridge('getState'));if(r&&r.success)setState(r.data)}catch(e){source.textContent='浏览器预览模式'}setInterval(async()=>{if(busy)return;try{const r=await Promise.resolve(bridge('consumePending'));const p=r&&r.data;if(p&&p.id!==lastPendingId){lastPendingId=p.id;pet.dataset.emotion=p.emotion||'neutral';if(p.reply)showBubble(p.reply);source.textContent='角色主动动作';await playActions([p.action])}}catch(_e){}},1800)}
+document.getElementById('reset').onclick=async()=>{try{const r=await Promise.resolve(bridge('resetState'));setState(r.data);pet.dataset.emotion='neutral';showBubble('重新开始');source.textContent='互动队列已清空'}catch(e){console.error(e)}};
+async function boot(){try{const r=await Promise.resolve(bridge('getState'));if(r&&r.success){setState(r.data);const n=(r.data.pending_events||[]).length;source.textContent=n?'待告诉角色 · '+n+' 条':'待机'}}catch(e){source.textContent='浏览器预览模式'}setInterval(async()=>{try{const r=await Promise.resolve(bridge('consumePending'));const p=r&&r.data;if(p&&p.id!==lastPendingId){lastPendingId=p.id;pet.dataset.emotion=p.emotion||'neutral';if(p.reply)showBubble(p.reply);source.textContent='角色主动动作';enqueueActions([p.action])}}catch(_e){}},1200)}
 boot();
 </script>
 </body>
