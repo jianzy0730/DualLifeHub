@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>双生猪猪</title>
+<style>
+:root{color-scheme:light;--bg:#fff7f7;--card:rgba(255,255,255,.82);--text:#4d3540;--muted:#987a87;--line:rgba(128,70,94,.10);--pink:#f58ca8;--pink2:#ffb4c3;--deep:#d86082;--gold:#efb735;--shadow:0 24px 70px rgba(134,70,94,.16)}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#1c1518;--card:rgba(39,29,34,.88);--text:#ffeef3;--muted:#c9aeb8;--line:rgba(255,255,255,.08);--pink:#f08aa8;--pink2:#c76f8c;--deep:#ff9fba;--shadow:none}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 5%,rgba(255,184,200,.3),transparent 38%),linear-gradient(160deg,var(--bg),color-mix(in srgb,var(--bg),#ffdce5 22%));font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text)}
+button{font:inherit;color:inherit;border:0}.app{height:100%;max-width:760px;margin:auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px}.brand-icon{width:40px;height:40px;border-radius:15px;background:linear-gradient(145deg,#fff,#ffd9e2);display:grid;place-items:center;box-shadow:0 0 0 1px var(--line),0 8px 24px rgba(216,96,130,.14);font-size:23px}.brand h1{font-size:18px;margin:0;letter-spacing:-.3px}.brand p{font-size:10px;color:var(--muted);margin:3px 0 0}.reset{width:38px;height:38px;border-radius:14px;background:var(--card);box-shadow:0 0 0 1px var(--line);display:grid;place-items:center}
+.stage-card{position:relative;min-height:0;border-radius:32px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.74),rgba(255,230,237,.72));box-shadow:var(--shadow),0 0 0 1px var(--line);touch-action:none}.stage-card:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.58);left:50%;top:47%;transform:translate(-50%,-50%);filter:blur(2px)}
+.room-dot{position:absolute;border-radius:50%;background:rgba(245,140,168,.12)}.d1{width:90px;height:90px;left:-24px;top:18%}.d2{width:56px;height:56px;right:8%;top:10%}.d3{width:120px;height:120px;right:-50px;bottom:-20px}
+.bubble{position:absolute;z-index:5;left:50%;top:18px;transform:translateX(-50%) scale(.96);max-width:82%;min-width:130px;padding:11px 16px;border-radius:18px 18px 18px 5px;background:var(--card);box-shadow:0 10px 28px rgba(116,68,87,.12),0 0 0 1px var(--line);text-align:center;font-size:13px;line-height:1.45;opacity:0;transition:.25s}.bubble.show{opacity:1;transform:translateX(-50%) scale(1)}.bubble.thinking:after{content:"";display:inline-block;width:10px;height:10px;margin-left:7px;border:2px solid var(--pink);border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-1px}@keyframes spin{to{transform:rotate(360deg)}}
+.pet-wrap{position:absolute;left:50%;top:54%;width:min(88vw,470px);height:min(70vh,480px);transform:translate(-50%,-50%);display:grid;place-items:center}.pig{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 18px 15px rgba(159,87,111,.18));transform-origin:50% 78%}.pig *{transform-box:fill-box}.shadow{fill:rgba(115,71,86,.12)}.body{fill:url(#bodyGrad);stroke:#e987a1;stroke-width:3}.head{fill:url(#headGrad);stroke:#e987a1;stroke-width:3}.ear{fill:#ffafc1;stroke:#e987a1;stroke-width:3;transform-origin:50% 82%}.ear-inner{fill:#f47f9d;opacity:.62}.leg{fill:#f7a0b5;stroke:#e987a1;stroke-width:3}.eye{fill:#2f2027}.eye-shine{fill:#fff}.snout{fill:#f47f9d;stroke:#dc6d8b;stroke-width:3}.nostril{fill:#b9506d;opacity:.78}.cheek{fill:#ff718f;opacity:.32}.collar{fill:#df6f8e}.bell{fill:url(#goldGrad);stroke:#c78c17;stroke-width:3}.tail-line{fill:none;stroke:#e77e9b;stroke-width:16;stroke-linecap:round;stroke-linejoin:round}.tail-highlight{fill:none;stroke:#ffc4d1;stroke-width:5;stroke-linecap:round}.mouth{fill:none;stroke:#a94361;stroke-width:4;stroke-linecap:round}.brow{fill:none;stroke:#7e3b50;stroke-width:4;stroke-linecap:round;opacity:0}.hit{fill:transparent;stroke:transparent;pointer-events:all}.tail-hit{fill:none;stroke:transparent;stroke-width:54;pointer-events:stroke}.hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;color:var(--muted);font-size:10px;background:rgba(255,255,255,.46);padding:7px 11px;border-radius:999px;white-space:nowrap;backdrop-filter:blur(9px)}
+#pet[data-emotion="happy"] .mouth{d:path("M 184 194 Q 200 209 216 194")}.pig[data-emotion="shy"] .cheek{opacity:.58}.pig[data-emotion="annoyed"] .brow{opacity:1}.pig[data-emotion="annoyed"] .mouth{d:path("M 188 204 Q 200 195 212 204")}.pig[data-emotion="sleepy"] .eye{transform:scaleY(.14);transform-origin:center}.pig[data-emotion="surprised"] .mouth{d:path("M 194 199 Q 200 211 206 199 Q 200 191 194 199")}
+.act-blink .eye{animation:blink .48s ease}.act-ear_twitch .ear-left{animation:earL .55s ease}.act-ear_twitch .ear-right{animation:earR .55s ease}.act-tail_wag .tail{animation:tailWag .75s ease-in-out 2}.act-head_tilt .head-group{animation:headTilt .8s ease}.act-bounce{animation:bounce .7s cubic-bezier(.2,.8,.2,1)}.act-lean_forward{animation:lean .85s ease}.act-nuzzle .head-group{animation:nuzzle .9s ease-in-out}.act-shake{animation:shake .55s ease}.act-recoil{animation:recoil .68s ease}.act-sit .body-group{animation:sit .8s ease}.act-sleep .eye{animation:sleepEyes 1.8s ease forwards}.act-sleep .zzz{animation:zzz 1.8s ease;opacity:1}.act-tail_snap .tail{animation:tailSnap .72s ease}.preview-tail .tail{transform:scaleX(1.15) rotate(9deg);transform-origin:0 50%}
+@keyframes blink{0%,35%,70%,100%{transform:scaleY(1)}50%{transform:scaleY(.08)}}@keyframes earL{0%,100%{transform:rotate(0)}45%{transform:rotate(-15deg)}}@keyframes earR{0%,100%{transform:rotate(0)}45%{transform:rotate(15deg)}}@keyframes tailWag{0%,100%{transform:rotate(0)}30%{transform:rotate(18deg)}70%{transform:rotate(-13deg)}}@keyframes headTilt{0%,100%{transform:rotate(0)}45%{transform:rotate(-8deg)}}@keyframes bounce{0%,100%{transform:translateY(0)}42%{transform:translateY(-23px) scale(1.02)}70%{transform:translateY(4px) scale(.99)}}@keyframes lean{0%,100%{transform:translate(0) scale(1)}45%{transform:translateY(12px) scale(1.045)}}@keyframes nuzzle{0%,100%{transform:translateX(0)}35%{transform:translateX(-10px) rotate(-3deg)}70%{transform:translateX(10px) rotate(3deg)}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px) rotate(-2deg)}40%{transform:translateX(9px) rotate(2deg)}60%{transform:translateX(-7px)}80%{transform:translateX(5px)}}@keyframes recoil{0%,100%{transform:translateX(0) scale(1)}35%{transform:translateX(-25px) scale(.95,1.05)}65%{transform:translateX(5px)}}@keyframes sit{0%,100%{transform:translateY(0)}45%{transform:translateY(15px) scaleY(.94)}}@keyframes sleepEyes{to{transform:scaleY(.1)}}@keyframes zzz{0%{opacity:0;transform:translate(0,10px)}50%{opacity:1}100%{opacity:0;transform:translate(15px,-25px)}}@keyframes tailSnap{0%,100%{transform:rotate(0) scaleX(1)}25%{transform:rotate(-32deg) scaleX(1.22)}48%{transform:rotate(28deg) scaleX(.88)}72%{transform:rotate(-14deg) scaleX(1.08)}}
+.bottom{display:grid;gap:9px}.meters{display:grid;grid-template-columns:1fr 1fr;gap:9px}.meter{background:var(--card);border-radius:17px;padding:10px 12px;box-shadow:0 0 0 1px var(--line)}.meter-head{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:7px}.bar{height:6px;background:rgba(130,80,99,.1);border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--deep));transition:width .5s}.bar.energy i{background:linear-gradient(90deg,#f3c14f,#f19b45)}.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quick button{height:43px;border-radius:15px;background:var(--card);box-shadow:0 0 0 1px var(--line);font-size:11px;font-weight:690}.quick button:active{transform:scale(.96);background:rgba(255,190,207,.35)}.source{position:absolute;right:13px;bottom:13px;font-size:9px;color:var(--muted);opacity:.66}
+@media(max-height:620px){.app{padding-top:8px;gap:7px}.brand-icon{width:34px;height:34px}.brand h1{font-size:16px}.pet-wrap{top:52%;height:68vh}.hint{display:none}.quick button{height:38px}.meter{padding:8px 10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="brand-icon">🐽</div><div><h1>双生猪猪</h1><p>身体由前端控制，性格完全来自当前角色卡</p></div></div>
+    <button class="reset" id="reset" aria-label="重置">↻</button>
+  </header>
+  <main class="stage-card" id="stage">
+    <i class="room-dot d1"></i><i class="room-dot d2"></i><i class="room-dot d3"></i>
+    <div class="bubble show" id="bubble">摸摸我，或者试试那条很明显的卷尾巴。</div>
+    <div class="pet-wrap">
+      <svg class="pig" id="pet" data-emotion="neutral" viewBox="0 0 420 430" aria-label="可互动小猪">
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd7e0"/><stop offset=".58" stop-color="#f8adc0"/><stop offset="1" stop-color="#ee8eaa"/></linearGradient>
+          <linearGradient id="headGrad" x1=".2" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#ffe7ec"/><stop offset=".65" stop-color="#fbb7c8"/><stop offset="1" stop-color="#f298b0"/></linearGradient>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe986"/><stop offset=".55" stop-color="#f4bc36"/><stop offset="1" stop-color="#d88b13"/></linearGradient>
+        </defs>
+        <ellipse class="shadow" cx="208" cy="376" rx="126" ry="26"/>
+        <g class="tail" data-zone="tail">
+          <path class="tail-line" d="M331 276 C389 255 400 310 367 324 C335 338 334 291 363 286 C390 282 395 321 370 345"/>
+          <path class="tail-highlight" d="M334 272 C380 258 392 296 370 307"/>
+          <path class="tail-hit" data-zone="tail" d="M331 276 C389 255 400 310 367 324 C335 338 334 291 363 286 C390 282 395 321 370 345"/>
+        </g>
+        <g class="body-group">
+          <ellipse class="body" cx="210" cy="287" rx="129" ry="103"/>
+          <ellipse class="leg" cx="128" cy="354" rx="42" ry="48"/><ellipse class="leg" cx="292" cy="354" rx="42" ry="48"/>
+          <path class="collar" d="M113 228 Q210 258 307 228 L302 252 Q210 278 118 252 Z"/>
+          <circle class="bell" cx="210" cy="263" r="22"/><path d="M196 263 Q210 247 224 263" fill="none" stroke="#fff0a9" stroke-width="4"/><circle cx="210" cy="277" r="4" fill="#9c6610"/>
+        </g>
+        <g class="head-group">
+          <g class="ear ear-left"><path d="M102 84 Q77 35 142 58 L153 115 Z"/><path class="ear-inner" d="M113 82 Q99 54 132 68 L141 101 Z"/></g>
+          <g class="ear ear-right"><path d="M318 84 Q343 35 278 58 L267 115 Z"/><path class="ear-inner" d="M307 82 Q321 54 288 68 L279 101 Z"/></g>
+          <ellipse class="head" cx="210" cy="156" rx="127" ry="111"/>
+          <path class="brow" d="M137 124 Q158 112 176 121"/><path class="brow" d="M244 121 Q264 112 283 124"/>
+          <ellipse class="eye" cx="157" cy="148" rx="18" ry="25"/><ellipse class="eye" cx="263" cy="148" rx="18" ry="25"/>
+          <circle class="eye-shine" cx="151" cy="139" r="7"/><circle class="eye-shine" cx="257" cy="139" r="7"/>
+          <ellipse class="cheek" cx="121" cy="188" rx="25" ry="14"/><ellipse class="cheek" cx="299" cy="188" rx="25" ry="14"/>
+          <ellipse class="snout" cx="210" cy="183" rx="47" ry="36"/><ellipse class="nostril" cx="191" cy="181" rx="7" ry="11"/><ellipse class="nostril" cx="229" cy="181" rx="7" ry="11"/>
+          <path class="mouth" d="M190 213 Q210 225 230 213"/>
+          <text class="zzz" x="315" y="105" opacity="0" fill="#c96e8a" font-size="27" font-weight="700">Z</text>
+          <ellipse class="hit" data-zone="head" cx="210" cy="156" rx="132" ry="116"/>
+        </g>
+        <ellipse class="hit" data-zone="body" cx="210" cy="305" rx="138" ry="108"/>
+      </svg>
+    </div>
+    <div class="hint">点头 · 长按 · 顺着摸 · 拖动 · 揪卷尾巴</div>
+    <span class="source" id="source">待机</span>
+  </main>
+  <footer class="bottom">
+    <div class="meters">
+      <div class="meter"><div class="meter-head"><span>亲密度</span><b id="affectionText">50</b></div><div class="bar"><i id="affectionBar" style="width:50%"></i></div></div>
+      <div class="meter"><div class="meter-head"><span>精力</span><b id="energyText">80</b></div><div class="bar energy"><i id="energyBar" style="width:80%"></i></div></div>
+    </div>
+    <div class="quick"><button data-action="tap_head">点点头</button><button data-action="pet_head">摸摸</button><button data-action="long_press">抱住</button><button data-action="tail_pull">揪尾巴</button></div>
+  </footer>
+</div>
+<script>
+const pet=document.getElementById('pet'),stage=document.getElementById('stage'),bubble=document.getElementById('bubble'),source=document.getElementById('source');
+const affectionBar=document.getElementById('affectionBar'),energyBar=document.getElementById('energyBar'),affectionText=document.getElementById('affectionText'),energyText=document.getElementById('energyText');
+let busy=false,pointer=null,bubbleTimer=null,lastPendingId='';
+const durations={blink:520,ear_twitch:620,tail_wag:1500,head_tilt:900,bounce:760,lean_forward:920,nuzzle:980,shake:650,recoil:760,sit:900,sleep:1900,tail_snap:820};
+const previews={tap_head:['blink'],tap_body:['bounce'],long_press:['lean_forward'],pet_head:['tail_wag'],pet_back:['tail_wag'],drag:['shake'],tail_pull:['tail_snap']};
+const previewReplies={tap_head:'嗯？',tap_body:'哼。',long_press:'……',pet_head:'唔。',pet_back:'还行。',drag:'别搬我。',tail_pull:'喂！'};
+function bridge(name,payload){const h=window.DualPigHost;if(!h||typeof h[name]!=='function')throw new Error('Operit 宿主桥接尚未就绪');let r=payload===undefined?h[name]():h[name](payload);if(typeof r==='string'){try{r=JSON.parse(r)}catch(_){}}return r}
+function showBubble(text,thinking=false){clearTimeout(bubbleTimer);bubble.textContent=text||'……';bubble.classList.toggle('thinking',thinking);bubble.classList.add('show');if(!thinking)bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),6500)}
+function setState(s){if(!s)return;const a=Math.max(0,Math.min(100,Number(s.affection??50))),e=Math.max(0,Math.min(100,Number(s.energy??80)));affectionBar.style.width=a+'%';energyBar.style.width=e+'%';affectionText.textContent=Math.round(a);energyText.textContent=Math.round(e);pet.dataset.emotion=s.mood||'neutral'}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function playActions(actions){for(const item of (actions||[]).slice(0,3)){const name=typeof item==='string'?item:item&&item.name;if(!durations[name])continue;const cls='act-'+name;pet.classList.remove(cls);void pet.getBoundingClientRect();pet.classList.add(cls);await sleep(durations[name]);pet.classList.remove(cls)}}
+async function interact(type,meta={}){if(busy)return;busy=true;source.textContent='角色正在决定动作';showBubble(previewReplies[type]||'……',true);playActions(previews[type]||['blink']);try{const result=await Promise.resolve(bridge('interact',{type,...meta}));if(!result||!result.success)throw new Error(result&&result.message||'角色没有回应');const data=result.data||{},d=data.decision||{};pet.dataset.emotion=d.emotion||'neutral';showBubble(d.reply||'……',false);source.textContent=data.source==='llm'?'当前角色卡 · LLM':'本地备用反应';setState(data.state);await playActions(d.actions||[])}catch(e){showBubble('我刚才走神了，再碰我一下。');source.textContent='调用失败';console.error(e)}finally{busy=false}}
+function zoneOf(target){const e=target&&target.closest&&target.closest('[data-zone]');return e?e.dataset.zone:'body'}
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const zone=zoneOf(e.target),now=Date.now();pointer={id:e.pointerId,zone,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,startAt:now,distance:0,triggered:false};stage.setPointerCapture?.(e.pointerId);if(zone==='tail')pet.classList.add('preview-tail');pointer.timer=setTimeout(()=>{if(pointer&&!pointer.triggered&&pointer.distance<15){pointer.triggered=true;interact('long_press',{duration_ms:Date.now()-pointer.startAt})}},680)});
+stage.addEventListener('pointermove',e=>{if(!pointer||e.pointerId!==pointer.id)return;const dx=e.clientX-pointer.lastX,dy=e.clientY-pointer.lastY;pointer.distance+=Math.hypot(dx,dy);pointer.lastX=e.clientX;pointer.lastY=e.clientY;if(pointer.zone==='tail'&&!pointer.triggered&&pointer.distance>24){pointer.triggered=true;clearTimeout(pointer.timer);interact('tail_pull',{distance:Math.round(pointer.distance),duration_ms:Date.now()-pointer.startAt})}});
+function endPointer(e){if(!pointer||e.pointerId!==pointer.id)return;clearTimeout(pointer.timer);pet.classList.remove('preview-tail');const p=pointer;pointer=null;if(p.triggered)return;const dur=Date.now()-p.startAt,dx=p.lastX-p.startX,dy=p.lastY-p.startY,absX=Math.abs(dx),absY=Math.abs(dy);if(p.zone==='head'&&p.distance>52&&absX>absY*.75)interact('pet_head',{distance:Math.round(p.distance),duration_ms:dur});else if(p.zone==='body'&&p.distance>58)interact('drag',{distance:Math.round(p.distance),duration_ms:dur});else if(p.zone==='tail')interact('tail_pull',{distance:0,duration_ms:dur});else interact(p.zone==='head'?'tap_head':'tap_body',{duration_ms:dur})}
+stage.addEventListener('pointerup',endPointer);stage.addEventListener('pointercancel',e=>{if(pointer&&e.pointerId===pointer.id){clearTimeout(pointer.timer);pointer=null;pet.classList.remove('preview-tail')}});
+document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>interact(b.dataset.action));
+document.getElementById('reset').onclick=async()=>{if(busy)return;try{const r=await Promise.resolve(bridge('resetState'));setState(r.data);pet.dataset.emotion='neutral';showBubble('重新开始。别又一上来就揪尾巴。')}catch(e){console.error(e)}};
+async function boot(){try{const r=await Promise.resolve(bridge('getState'));if(r&&r.success)setState(r.data)}catch(e){source.textContent='浏览器预览模式'}setInterval(async()=>{if(busy)return;try{const r=await Promise.resolve(bridge('consumePending'));const p=r&&r.data;if(p&&p.id!==lastPendingId){lastPendingId=p.id;pet.dataset.emotion=p.emotion||'neutral';if(p.reply)showBubble(p.reply);source.textContent='角色主动动作';await playActions([p.action])}}catch(_e){}},1800)}
+boot();
+</script>
+</body>
+</html>
