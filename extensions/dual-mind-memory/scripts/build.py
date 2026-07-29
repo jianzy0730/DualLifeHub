@@ -19,10 +19,12 @@ def main() -> None:
         raise SystemExit("VERSION does not match manifest.json")
 
     shutil.copyfile(ROOT / "src" / "main.js", ROOT / "main.js")
-    shutil.copyfile(
-        ROOT / "src" / "dual_mind_memory.js",
-        ROOT / "packages" / "dual_mind_memory.js",
-    )
+    parts = sorted((ROOT / "src" / "dual_mind_memory_parts").glob("*.js"))
+    if not parts:
+        raise SystemExit("No DualMind Memory source parts found")
+    runtime_source = "".join(path.read_text(encoding="utf-8") for path in parts)
+    (ROOT / "packages").mkdir(parents=True, exist_ok=True)
+    (ROOT / "packages" / "dual_mind_memory.js").write_text(runtime_source, encoding="utf-8")
 
     subprocess.run(["node", "--check", str(ROOT / "main.js")], check=True)
     subprocess.run(
