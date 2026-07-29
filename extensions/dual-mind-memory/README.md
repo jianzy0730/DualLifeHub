@@ -67,11 +67,10 @@ dual_mind_memory/
 
 ```bash
 node --check src/main.js
-node --check src/dual_mind_memory.js
-node tests/mock_runtime_test.js
+python scripts/build.py
 ```
 
-`src/` 是唯一维护源码；构建脚本会生成被 Git 忽略的根入口与 `packages/` 运行文件，并打包 `.toolpkg`。
+`src/main.js` 与 `src/dual_mind_memory_parts/` 是维护源码；构建脚本会拼接工具源码，生成被 Git 忽略的根入口与 `packages/` 运行文件，执行模拟测试并打包 `.toolpkg`。
 
 ## 隐私边界
 
